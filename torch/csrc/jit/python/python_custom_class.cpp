@@ -2,6 +2,8 @@
 
 #include <torch/csrc/jit/frontend/sugared_value.h>
 
+#include <torch/csrc/jit/python/pybind_utils.h>
+
 #include <fmt/format.h>
 
 namespace torch {
@@ -21,8 +23,18 @@ py::object ScriptClass::__call__(py::args args, py::kwargs kwargs) {
           "Did you forget to add '.def(torch::init<...>)' to its registration?",
           instance.type()->repr_str()));
   Method init_method(instance._ivalue(), init_fn);
-  // NOLINTNEXTLINE(performance-move-const-arg)
-  invokeScriptMethodFromPython(init_method, std::move(args), std::move(kwargs));
+  auto input_args = std::move(args);
+  auto input_kwargs = std::move(kwargs);
+
+  auto resolved_init_method = match_overloaded_methods(
+      init_method.owner(), init_method.name(), input_args, input_kwargs);
+
+  if (resolved_init_method.has_value()) {
+    invokeScriptMethodFromPython(
+        resolved_init_method.value(), input_args, input_kwargs);
+  } else {
+    invokeScriptMethodFromPython(init_method, input_args, input_kwargs);
+  }
   return py::cast(instance);
 }
 

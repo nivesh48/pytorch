@@ -4,6 +4,7 @@
 #include <torch/csrc/jit/frontend/tree_views.h>
 #include <torch/csrc/jit/ir/ir.h>
 #include <torch/csrc/jit/passes/constant_propagation.h>
+#include <memory>
 
 namespace torch {
 namespace jit {
@@ -151,6 +152,10 @@ std::shared_ptr<SugaredValue> SimpleValue::attr(
   } else if (auto classType = value_->type()->cast<ClassType>()) {
     // This is a class, emit the proper attribute lookup
     if (auto method = classType->findMethod(field)) {
+      if (auto overloaded_methods = classType->findOverloadedMethod(field)) {
+        return std::make_shared<MethodValue>(
+            getValue(), overloaded_methods.value());
+      }
       return std::make_shared<MethodValue>(getValue(), field);
     }
     if (classType->hasAttribute(field)) {
@@ -639,7 +644,12 @@ std::shared_ptr<SugaredValue> ClassValue::call(
   }
 
   // Call the init function
-  MethodValue(self, "__init__").call(loc, m, args, kwargs, n_binders);
+  if (auto overloaded_init_methods = type_->findOverloadedMethod("__init__")) {
+    MethodValue(self, overloaded_init_methods.value())
+        .call(loc, m, args, kwargs, n_binders);
+  } else {
+    MethodValue(self, "__init__").call(loc, m, args, kwargs, n_binders);
+  }
 
   return std::make_shared<SimpleValue>(self);
 }
