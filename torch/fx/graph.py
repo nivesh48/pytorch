@@ -3,6 +3,7 @@ import torch.utils._pytree as pytree
 from . import _pytree as fx_pytree
 
 from typing import TYPE_CHECKING, Callable, Any, List, Dict, NamedTuple, Optional, Tuple, Set, FrozenSet
+import typing as _python_typing
 from dataclasses import dataclass
 from contextlib import contextmanager
 import copy
@@ -15,7 +16,7 @@ import warnings
 
 
 if TYPE_CHECKING:
-    from .graph_module import GraphModule
+    from .graph_module import GraphModule  # noqa: F401
 
 
 # Mapping of builtins to their `typing` equivalent.
@@ -49,6 +50,7 @@ def _register_custom_builtin(name: str, import_str: str, obj: Any):
 _register_custom_builtin('inf', 'from math import inf', math.inf)
 _register_custom_builtin('nan', 'from math import nan', math.nan)
 _register_custom_builtin('NoneType', 'NoneType = type(None)', type(None))
+_register_custom_builtin('typing', 'import typing', _python_typing)
 _register_custom_builtin('torch', 'import torch', torch)
 _register_custom_builtin('device', 'from torch import device', torch.device)
 _register_custom_builtin('fx_pytree', 'import torch.fx._pytree as fx_pytree', fx_pytree)
@@ -122,6 +124,10 @@ class _Namespace:
 
         # delete all characters that are illegal in a Python identifier
         candidate = self._illegal_char_regex.sub('_', candidate)
+
+        if candidate.startswith("typing_"):
+            candidate = "typing." + candidate.partition("typing_")[2]
+
         if candidate[0].isdigit():
             candidate = f'_{candidate}'
 
@@ -825,6 +831,7 @@ class Graph:
 
             # normalize the name hint to get a proper identifier
             global_name = namespace.create_name(name_hint, obj)
+
             if global_name in globals_:
                 assert globals_[global_name] is obj
                 return global_name
@@ -836,6 +843,10 @@ class Graph:
             add_global(name, obj)
 
         def type_repr(o : Any):
+            if o == ():
+                # Empty tuple is used for empty tuple type annotation Tuple[()]
+                return '()'
+
             typename = _type_repr(o)
 
             # This is a generic type, e.g. typing.List[torch.Tensor]
@@ -845,6 +856,7 @@ class Graph:
 
                 # Assign global names for each of the inner type variables.
                 args = [type_repr(arg) for arg in o.__args__]
+
                 return f'{origin_typename}[{",".join(args)}]'
 
             # Common case: this is a regular module name like 'foo.bar.baz'
