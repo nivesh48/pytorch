@@ -7,7 +7,8 @@ from torch._C import _add_docstr, _linalg  # type: ignore[attr-defined]
 Tensor = torch.Tensor
 
 common_notes = {
-    "sync_note": """When inputs are on a CUDA device, this function synchronizes that device with the CPU."""
+    "sync_note": """When inputs are on a CUDA device, this function synchronizes that device with the CPU.""",
+    "batch_support_note": """Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions."""
 }
 
 
@@ -31,8 +32,8 @@ where :math:`L` is a lower triangular matrix and
 :math:`L^{\text{H}}` is the conjugate transpose when :math:`L` is complex, and the transpose when :math:`L` is real-valued.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
-""" + r"""
+{batch_support_note}
+""".format(**common_notes) + r"""
 
 .. note:: {sync_note}
 
@@ -41,6 +42,10 @@ Also supports batched inputs, and, if the input is batched, the output is batche
         :func:`torch.linalg.eigh` for a different decomposition of a Hermitian matrix.
         The eigenvalue decomposition gives more information about the matrix but it
         slower to compute than the Cholesky decomposition.
+
+        :func:`torch.linalg.cholesky_ex` for a version of this operation
+        that skips the (slow) error checking by default and is a better way
+        to check if a matrix is positive-definite.
 
 Args:
     A (Tensor): tensor of shape `(*, n, n)` where `*` is zero or more batch dimensions
@@ -100,8 +105,13 @@ linalg.cholesky_ex(input, *, check_errors=False, out=None) -> (Tensor, Tensor)
 
 Computes the Cholesky decomposition of a complex Hermitian or real symmetric positive-definite matrix.
 
+By default, this function skips the slow error checking and error message
+construction of :func:`torch.linalg.cholesky`. This can make this function considerably
+faster, and it is also a quick way to check if a matrix is positive-definite (
+by reviewing the returned info tensor).
+
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 Returns a namedtuple ``(L,info)``. ``L`` contains the result of the Cholesky decomposition.
 ``info`` stores the LAPACK error codes.
@@ -143,7 +153,7 @@ Examples::
     >>> info
     tensor(0, dtype=torch.int32)
 
-""")
+""".format(**common_notes))
 
 inv = _add_docstr(_linalg.linalg_inv, r"""
 linalg.inv(A, *, out=None) -> Tensor
@@ -166,7 +176,7 @@ The inverse matrix exists if and only if :math:`A` is `invertible`_. In this cas
 the inverse is unique.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: {sync_note}
 
@@ -233,7 +243,7 @@ linalg.det(A, *, out=None) -> Tensor
 Computes the determinant of a square matrix.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: This function is computed using :func:`torch.lu`.
           {sync_note}
@@ -289,7 +299,7 @@ For complex :attr:`A`, it returns the angle and the natural logarithm of the mod
 determinant, that is, a logarithmic polar decomposition of the determinant.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: This function is computed using :func:`torch.lu`.
           {sync_note}
@@ -348,7 +358,7 @@ This is the case when all its eigenvalues are different.
 r""" + """
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: The eigenvalues and eigenvectors of a real matrix may be complex.
 
@@ -437,7 +447,7 @@ where :math:`\mathrm{I}_n` is the `n`-dimensional identity matrix.
 """ + r"""
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: The eigenvalues of a real matrix may be complex, as the roots of a real polynomial may be complex.
 
@@ -486,7 +496,7 @@ where :math:`Q^{\text{H}}` is the conjugate transpose when :math:`Q` is complex,
 """ + r"""
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 :attr:`A` is assumed to be Hermitian (resp. symmetric), but this is not checked internally, instead:
 
@@ -594,10 +604,10 @@ where :math:`\mathrm{I}_n` is the `n`-dimensional identity matrix.
 The eigenvalues of a real symmetric or complex Hermitian matrix are always real.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 The eigenvalues are returned in ascending order.
-""" + r"""
+""".format(**common_notes) + r"""
 
 :attr:`A` is assumed to be Hermitian (resp. symmetric), but this is not checked internally, instead:
 
@@ -672,7 +682,7 @@ where :math:`\mathrm{I}_m` is the `m`-dimensional identity matrix and
 See `Representation of Orthogonal or Unitary Matrices`_ for further details.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 .. note:: This function only uses the values strictly below the main diagonal of :attr:`A`.
           The other values are ignored.
@@ -720,7 +730,7 @@ Examples::
 
 .. _Representation of Orthogonal or Unitary Matrices:
     https://www.netlib.org/lapack/lug/node128.html
-""")
+""".format(**common_notes))
 
 lstsq = _add_docstr(_linalg.linalg_lstsq, r"""
 torch.linalg.lstsq(A, B, rcond=None, *, driver=None) -> (Tensor, Tensor, Tensor, Tensor)
@@ -738,7 +748,7 @@ the **least squares problem** for a linear system :math:`AX = B` with
 where :math:`\|-\|_F` denotes the Frobenius norm.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 :attr:`driver` chooses the LAPACK/MAGMA function that will be used.
 For CPU inputs the valid values are `'gels'`, `'gelsy'`, `'gelsd`, `'gelss'`.
@@ -831,7 +841,7 @@ Examples::
     https://pytorch.org/docs/master/linalg.html#torch.linalg.cond
 .. _full description of these drivers:
     https://www.netlib.org/lapack/lug/node27.html
-""")
+""".format(**common_notes))
 
 matrix_power = _add_docstr(_linalg.linalg_matrix_power, r"""
 matrix_power(A, n, *, out=None) -> Tensor
@@ -839,7 +849,7 @@ matrix_power(A, n, *, out=None) -> Tensor
 Computes the `n`-th power of a square matrix for an integer `n`.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 If :attr:`n`\ `= 0`, it returns the identity matrix (or batch) of the same shape
 as :attr:`A`. If :attr:`n` is negative, it returns the inverse of each matrix
@@ -892,7 +902,7 @@ Examples::
             [[ 0.2640,  0.4571, -0.5511],
             [-1.0163,  0.3491, -1.5292],
             [-0.4899,  0.0822,  0.2773]]])
-""")
+""".format(**common_notes))
 
 matrix_rank = _add_docstr(_linalg.linalg_matrix_rank, r"""
 matrix_rank(A, tol=None, hermitian=False, *, out=None) -> Tensor
@@ -904,7 +914,7 @@ The matrix rank is computed as the number of singular values
 that are greater than the specified :attr:`tol` threshold.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 If :attr:`hermitian`\ `= True`, :attr:`A` is assumed to be Hermitian if complex or
 symmetric if real, but this is not checked internally. Instead, just the lower
@@ -916,7 +926,7 @@ the tolerance is set to be
 .. math::
 
     \text{tol} = \sigma_1 \max(m, n) \varepsilon
-""" + r"""
+""".format(**common_notes) + r"""
 
 where :math:`\sigma_1` is the largest singular value
 (or eigenvalue in absolute value when :attr:`hermitian`\ `= True`), and
@@ -981,7 +991,7 @@ Computes a vector or a matrix norm.
 If :attr:`A` is complex valued, it computes the norm of :attr:`A`\ `.abs()`
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 - If :attr:`dim` is an `int`, the vector norm will be computed.
 - If :attr:`dim` is a `2`-`tuple`, the matrix norm will be computed.
@@ -1105,7 +1115,7 @@ Using the :attr:`dim` argument to compute matrix norms::
     tensor([ 3.7417, 11.2250])
     >>> LA.norm(m[0, :, :]), LA.norm(m[1, :, :])
     (tensor(3.7417), tensor(11.2250))
-""")
+""".format(**common_notes))
 
 vector_norm = _add_docstr(_linalg.linalg_vector_norm, r"""
 linalg.vector_norm(A, ord=2, dim=None, keepdim=False, *, dtype=None, out=None) -> Tensor
@@ -1115,7 +1125,7 @@ Computes a vector norm.
 If :attr:`A` is complex valued, it computes the norm of :attr:`A`\ `.abs()`
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 - If :attr:`dim`\ `= None`, :attr:`A` will be flattened before the norm is computed.
 - If :attr:`dim` is an `int` or a `tuple`, the norm will be computed over these dimensions
@@ -1168,7 +1178,7 @@ Examples::
     tensor(5.4345)
     >>> LA.vector_norm(b, ord=3.5)
     tensor(5.4345)
-""")
+""".format(**common_notes))
 
 matrix_norm = _add_docstr(_linalg.linalg_matrix_norm, r"""
 linalg.matrix_norm(A, ord='fro', dim=(-2, -1), keepdim=False, *, dtype=None, out=None) -> Tensor
@@ -1178,7 +1188,7 @@ Computes a matrix norm.
 If :attr:`A` is complex valued, it computes the norm of :attr:`A`\ `.abs()`
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 The norm will be computed over the dimensions specified by the 2-tuple :attr:`dim`
 and the other dimensions will be treated as batch dimensions.
@@ -1241,7 +1251,7 @@ Examples::
     tensor([14.2829, 14.2829])
     >>> LA.matrix_norm(B, dim=(0, 2))
     tensor([ 3.1623, 10.0000, 17.2627])
-""")
+""".format(**common_notes))
 
 multi_dot = _add_docstr(_linalg.linalg_multi_dot, r"""
 linalg.multi_dot(tensors, *, out=None)
@@ -1342,7 +1352,7 @@ where :math:`\operatorname{diag}(S) \in \mathbb{K}^{k \times k}`.
 In this case, :math:`U` and :math:`V` also have orthonormal columns.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 The returned decomposition is a named tuple `(U, S, Vh)`
 which corresponds to :math:`U`, :math:`S`, :math:`V^{\text{H}}` above.
@@ -1449,7 +1459,7 @@ Examples::
 
 .. _the resulting vectors will span the same subspace:
     https://en.wikipedia.org/wiki/Singular_value_decomposition#Singular_values,_singular_vectors,_and_their_relation_to_the_SVD
-""")
+""".format(**common_notes))
 
 svdvals = _add_docstr(_linalg.linalg_svdvals, r"""
 linalg.svdvals(A, *, out=None) -> Tensor
@@ -1457,7 +1467,7 @@ linalg.svdvals(A, *, out=None) -> Tensor
 Computes the singular values of a matrix.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 The singular values are returned in descending order.
 
@@ -1510,7 +1520,7 @@ The condition number of :attr:`A` measures the numerical stability of the linear
 with respect to a matrix norm.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 :attr:`p` defines the matrix norm that is computed. The following norms are supported:
 
@@ -1624,7 +1634,7 @@ Examples::
             [4.5671]])
     >>> torch.linalg.cond(a, 1)
     tensor([9.2589, 9.3486])
-""")
+""".format(**common_notes))
 
 pinv = _add_docstr(_linalg.linalg_pinv, r"""
 linalg.pinv(A, rcond=1e-15, hermitian=False, *, out=None) -> Tensor
@@ -1635,7 +1645,7 @@ The pseudoinverse may be `defined algebraically`_
 but it is more computationally convenient to understand it `through the SVD`_
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 If :attr:`hermitian`\ `= True`, :attr:`A` is assumed to be Hermitian if complex or
 symmetric if real, but this is not checked internally. Instead, just the lower
@@ -1744,7 +1754,7 @@ Examples::
     https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Existence_and_uniqueness
 .. _through the SVD:
     https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Singular_value_decomposition_(SVD)
-""")
+""".format(**common_notes))
 
 solve = _add_docstr(_linalg.linalg_solve, r"""
 linalg.solve(A, B, *, out=None) -> Tensor
@@ -1762,7 +1772,7 @@ This system of linear equations has one solution if and only if :math:`A` is `in
 This function assumes that :math:`A` is invertible.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 Letting `*` be zero or more batch dimensions,
 
@@ -1982,7 +1992,7 @@ In this case, we can drop the last `m - n` columns of `Q` to form the
 The reduced QR decomposition agrees with the full QR decomposition when `n >= m` (wide matrix).
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions.
+{batch_support_note}
 
 The parameter :attr:`mode` chooses between the full and reduced QR decomposition.
 If :attr:`A` has shape `(*, m, n)`, denoting `k = min(m, n)`
@@ -2055,4 +2065,4 @@ Examples::
     True
     >>> torch.allclose(torch.matmul(q.transpose(-2, -1), q), torch.eye(4), atol=1e-5)
     True
-""")
+""".format(**common_notes))
