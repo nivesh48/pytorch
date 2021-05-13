@@ -8,7 +8,8 @@ Tensor = torch.Tensor
 
 common_notes = {
     "sync_note": """When inputs are on a CUDA device, this function synchronizes that device with the CPU.""",
-    "batch_support_note": """Also supports batched inputs, and, if the input is batched, the output is batched with the same dimensions."""
+    "batch_support_note": """Also supports batched inputs, and, if the input is batched,
+        the output is batched with the same dimensions."""
 }
 
 
