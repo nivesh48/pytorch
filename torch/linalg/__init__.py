@@ -31,7 +31,7 @@ the **Cholesky decomposition** of a complex Hermitian or real symmetric positive
 where :math:`L` is a lower triangular matrix and
 :math:`L^{\text{H}}` is the conjugate transpose when :math:`L` is complex, and the transpose when :math:`L` is real-valued.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
 {batch_support_note}
 """.format(**common_notes) + r"""
 
@@ -603,7 +603,7 @@ are defined as the roots (counted with multiplicity) of the polynomial `p` of de
 where :math:`\mathrm{I}_n` is the `n`-dimensional identity matrix.
 The eigenvalues of a real symmetric or complex Hermitian matrix are always real.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
 {batch_support_note}
 
 The eigenvalues are returned in ascending order.
@@ -681,7 +681,7 @@ where :math:`\mathrm{I}_m` is the `m`-dimensional identity matrix and
 
 See `Representation of Orthogonal or Unitary Matrices`_ for further details.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
 {batch_support_note}
 
 .. note:: This function only uses the values strictly below the main diagonal of :attr:`A`.
@@ -747,7 +747,7 @@ the **least squares problem** for a linear system :math:`AX = B` with
 
 where :math:`\|-\|_F` denotes the Frobenius norm.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
 {batch_support_note}
 
 :attr:`driver` chooses the LAPACK/MAGMA function that will be used.
@@ -1351,8 +1351,8 @@ When `m > n` (resp. `m < n`) we can drop the last `m - n` (resp. `n - m`) column
 where :math:`\operatorname{diag}(S) \in \mathbb{K}^{k \times k}`.
 In this case, :math:`U` and :math:`V` also have orthonormal columns.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
-{batch_support_note}
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
+{batch_support_note}""".format(**common_notes) + r"""
 
 The returned decomposition is a named tuple `(U, S, Vh)`
 which corresponds to :math:`U`, :math:`S`, :math:`V^{\text{H}}` above.
@@ -1459,7 +1459,7 @@ Examples::
 
 .. _the resulting vectors will span the same subspace:
     https://en.wikipedia.org/wiki/Singular_value_decomposition#Singular_values,_singular_vectors,_and_their_relation_to_the_SVD
-""".format(**common_notes))
+""")
 
 svdvals = _add_docstr(_linalg.linalg_svdvals, r"""
 linalg.svdvals(A, *, out=None) -> Tensor
@@ -1991,7 +1991,7 @@ In this case, we can drop the last `m - n` columns of `Q` to form the
 
 The reduced QR decomposition agrees with the full QR decomposition when `n >= m` (wide matrix).
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
 {batch_support_note}
 
 The parameter :attr:`mode` chooses between the full and reduced QR decomposition.
