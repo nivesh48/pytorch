@@ -749,7 +749,7 @@ the **least squares problem** for a linear system :math:`AX = B` with
 where :math:`\|-\|_F` denotes the Frobenius norm.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
-{batch_support_note}
+{batch_support_note} """.format(**common_notes) + r"""
 
 :attr:`driver` chooses the LAPACK/MAGMA function that will be used.
 For CPU inputs the valid values are `'gels'`, `'gelsy'`, `'gelsd`, `'gelss'`.
@@ -768,11 +768,11 @@ To choose the best driver on CPU consider:
 
 See also the `full description of these drivers`_
 
-:attr:`cond` is used to determine the effective rank of the matrices in :attr:`A`
+:attr:`rcond` is used to determine the effective rank of the matrices in :attr:`A`
 when :attr:`driver` is one of (`'gelsy'`, `'gelsd'`, `'gelss'`).
 In this case, if :math:`\sigma_i` are the singular values of `A` in decreasing order,
-:math:`\sigma_i` will be rounded down to zero if :math:`\sigma_i \leq \text{cond} \cdot \sigma_1`.
-If :attr:`cond`\ `= None` (default), :attr:`cond` is set to the machine precision of the dtype of :attr:`A`.
+:math:`\sigma_i` will be rounded down to zero if :math:`\sigma_i \leq \text{rcond} \cdot \sigma_1`.
+If :attr:`rcond`\ `= None` (default), :attr:`rcond` is set to the machine precision of the dtype of :attr:`A`.
 
 This function returns the solution to the problem and some extra information in a named tuple of
 four tensors `(solution, residuals, rank, singular_values)`. For inputs :attr:`A`, :attr:`B`
@@ -842,7 +842,7 @@ Examples::
     https://pytorch.org/docs/master/linalg.html#torch.linalg.cond
 .. _full description of these drivers:
     https://www.netlib.org/lapack/lug/node27.html
-""".format(**common_notes))
+""")
 
 matrix_power = _add_docstr(_linalg.linalg_matrix_power, r"""
 matrix_power(A, n, *, out=None) -> Tensor
@@ -850,7 +850,7 @@ matrix_power(A, n, *, out=None) -> Tensor
 Computes the `n`-th power of a square matrix for an integer `n`.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-{batch_support_note}
+{batch_support_note}""".format(**common_notes) + r"""
 
 If :attr:`n`\ `= 0`, it returns the identity matrix (or batch) of the same shape
 as :attr:`A`. If :attr:`n` is negative, it returns the inverse of each matrix
@@ -903,7 +903,7 @@ Examples::
             [[ 0.2640,  0.4571, -0.5511],
             [-1.0163,  0.3491, -1.5292],
             [-0.4899,  0.0822,  0.2773]]])
-""".format(**common_notes))
+""")
 
 matrix_rank = _add_docstr(_linalg.linalg_matrix_rank, r"""
 matrix_rank(A, tol=None, hermitian=False, *, out=None) -> Tensor
@@ -915,7 +915,7 @@ The matrix rank is computed as the number of singular values
 that are greater than the specified :attr:`tol` threshold.
 
 Supports inputs of float, double, cfloat and cdouble dtypes.
-{batch_support_note}
+{batch_support_note}""".format(**common_notes) + r"""
 
 If :attr:`hermitian`\ `= True`, :attr:`A` is assumed to be Hermitian if complex or
 symmetric if real, but this is not checked internally. Instead, just the lower
@@ -927,7 +927,7 @@ the tolerance is set to be
 .. math::
 
     \text{tol} = \sigma_1 \max(m, n) \varepsilon
-""".format(**common_notes) + r"""
+""" + r"""
 
 where :math:`\sigma_1` is the largest singular value
 (or eigenvalue in absolute value when :attr:`hermitian`\ `= True`), and
@@ -1520,8 +1520,8 @@ the **condition number** :math:`\kappa` of a matrix
 The condition number of :attr:`A` measures the numerical stability of the linear system `AX = B`
 with respect to a matrix norm.
 
-Supports inputs of float, double, cfloat and cdouble dtypes.
-{batch_support_note}
+Supports inputs of float, double, cfloat and cdouble dtypes.""" + r"""
+{batch_support_note}""".format(**common_notes) + r"""
 
 :attr:`p` defines the matrix norm that is computed. The following norms are supported:
 
@@ -1635,7 +1635,7 @@ Examples::
             [4.5671]])
     >>> torch.linalg.cond(a, 1)
     tensor([9.2589, 9.3486])
-""".format(**common_notes))
+""")
 
 pinv = _add_docstr(_linalg.linalg_pinv, r"""
 linalg.pinv(A, rcond=1e-15, hermitian=False, *, out=None) -> Tensor
